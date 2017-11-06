@@ -1,5 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import { Table, Pagination, Navbar, FormControl, FormGroup, Button } from 'react-bootstrap'
+import Preloader from './../components/preloader.jsx'
 
 class AppContainer extends Component {
   constructor(props) {
@@ -14,8 +15,12 @@ class AppContainer extends Component {
   activePage = 1
 
   handleSelect = (eventKey) => {
+    this.setState({
+      inputValue: ''
+    })
     this.activePage = eventKey
     this.props.actions.resetPokemonData()
+    this.props.actions.resetRequestCount()
     this.props.actions.requestPokeData(this.activePage)
   }
   
@@ -25,30 +30,35 @@ class AppContainer extends Component {
     })
   }
 
-  onSearchClick = (e) => {
-    const smth = this.props.appState.listOfPokemons.filter(pokemon => {
-      return pokemon.name.includes(this.state.inputValue);
-    })
-    this.setState({
-      isSearching: true
-    })
-  }
-
   render () {
     const { appState } = this.props
-    let firstPart = firstPart = appState.listOfPokemons.filter(pokemon => {
-        return pokemon.name.includes(this.state.inputValue)
+    const filterByType = (pokemon) => {
+      let result;
+      pokemon.types.forEach(type => {
+        if (type.type.name.includes(this.state.inputValue)) {
+            result = true;
+            return;
+          } else {
+            result = false;
+          }
+      })
+      return result
+    }
+    const pokemons = appState.listOfPokemons.filter(pokemon => {
+      return (
+        pokemon.name.includes(this.state.inputValue) 
+        || 
+        filterByType(pokemon)
+      )
     })
     return (
       <div>
-        {appState.isRequestSucceed ?
+        {appState.requestsCount === 10 ?
           <div className='app-container'>
             <Navbar>
-            <FormGroup>
-              <FormControl onChange={this.onInputChange} type='text' placeholder='Search' />
-            </FormGroup>
-            {/*<Button bsSize='sm'>Reset</Button>*/}
-            <Button type='submit' onClick={this.onSearchClick}>Search</Button>
+              <FormGroup bsClass='search-container'>
+                <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or type' />
+              </FormGroup>
             </Navbar>
             <Table striped bordered condensed hover responsive>
               <thead>
@@ -67,7 +77,7 @@ class AppContainer extends Component {
                 </tr>
               </thead>
               <tbody>
-                {firstPart.map((pokemon, index) => {
+                {pokemons.map((pokemon, index) => {
                   return (
                     <tr key={pokemon.id}>
                       <td>
@@ -75,7 +85,7 @@ class AppContainer extends Component {
                       </td>
                       <td>{pokemon.name}</td>
                       <td>{pokemon.types.map(type => {
-                        return (<p key={Math.random()}>{type.type.name}</p>)
+                        return (<p key={Math.random()} onClick={this.filterByType}>{type.type.name}</p>)
                       })}
                       </td>
                       <td>{pokemon.weight}</td>
@@ -98,7 +108,7 @@ class AppContainer extends Component {
             />
           </div>
           :
-          <div>Loading...</div>
+          <Preloader />
         }
       </div>
     )

@@ -5,7 +5,8 @@ const initialState = {
   listOfPokemonUrls: null,
   listOfPokemons: [],
   isRequestSucceed: false,
-  isRequestFailed: false
+  isRequestFailed: false,
+  requestsCount: 0
 }
 
 const appReducer = (state = initialState, action) => {
@@ -24,12 +25,18 @@ const appReducer = (state = initialState, action) => {
     case types.REQUEST_POKEMON_DATA:
       return {
         ...state,
+        requestsCount: action.payload.requestsCount,
         listOfPokemons: [...state.listOfPokemons, action.payload.pokeData]
       }
     case types.RESET_POKEMON_DATA:
       return {
         ...state,
         listOfPokemons: []
+      }
+    case types.RESET_REQUEST_COUNT:
+      return {
+        ...state,
+        requestsCount: 0
       }
     default:
       return state
