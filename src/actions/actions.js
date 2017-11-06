@@ -40,13 +40,15 @@ export function requestPokeData (activePage) {
         break
     }
     fetchAsync(`https://pokeapi.co/api/v2/pokemon/?limit=10${reqestOffset !== 0 ? '&offset=' + reqestOffset : ''}`)
+      // since pokeapi is almost always under heavy load im using only 30 pokemons in total for this app
+      // only loading 10 at once
       .then(data => {
         dispatch({ type: types.SEND_POKEAPI_REQUEST_SUCCSESS, payload: { pokemons: data } })
         let requestsCount = 0
         data.results.forEach(result => {
           fetchAsync(result.url)
             .then(pokeData => {
-              requestsCount = requestsCount + 1
+              requestsCount = requestsCount + 1 // requestCount here to help indicate amount of succsessful requests
               dispatch({ type: types.REQUEST_POKEMON_DATA, payload: { pokeData, requestsCount } })
             })
             .catch(err => {

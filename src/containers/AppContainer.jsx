@@ -12,16 +12,16 @@ class AppContainer extends Component {
   componentWillMount () {
     this.props.actions.requestPokeData(this.activePage)
   }
-  activePage = 1
+  activePage = 1 // active page for pagination
 
   handleSelect = (eventKey) => {
     this.setState({
       inputValue: ''
     })
     this.activePage = eventKey
-    this.props.actions.resetPokemonData()
-    this.props.actions.resetRequestCount()
-    this.props.actions.requestPokeData(this.activePage)
+    this.props.actions.resetPokemonData() // empty redux data
+    this.props.actions.resetRequestCount() // reset requestCount to prevent bugs when swtiching pages
+    this.props.actions.requestPokeData(this.activePage) // request new data on page switch
   }
   
   onInputChange = (e) => {
@@ -53,11 +53,11 @@ class AppContainer extends Component {
     })
     return (
       <div>
-        {appState.requestsCount === 10 ?
+        {appState.requestsCount === 10 ? // if not all 10 requests loaded - show preloader
           <div className='app-container'>
             <Navbar>
               <FormGroup bsClass='search-container'>
-                <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or type' />
+                <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
               </FormGroup>
             </Navbar>
             <Table striped bordered condensed hover responsive>
@@ -85,7 +85,7 @@ class AppContainer extends Component {
                       </td>
                       <td>{pokemon.name}</td>
                       <td>{pokemon.types.map(type => {
-                        return (<p key={Math.random()} onClick={this.filterByType}>{type.type.name}</p>)
+                        return (<p key={Math.random()}>{type.type.name}</p>)
                       })}
                       </td>
                       <td>{pokemon.weight}</td>
