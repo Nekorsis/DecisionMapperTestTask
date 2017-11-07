@@ -1,20 +1,28 @@
 import React, { PureComponent, Component } from 'react'
 import { Table, Pagination, Navbar, FormControl, FormGroup, Button } from 'react-bootstrap'
 import Preloader from './../components/preloader.jsx'
+import PokemonTable from './../components/pokemonTable.jsx'
 
 class AppContainer extends Component {
   constructor(props) {
     super(props)
     this.state = {
       inputValue: '',
+      searchInputValue: '',
+      isSearching: false,
     }
   }
   componentWillMount () {
-    this.props.actions.requestPokeData(this.activePage)
+    this.props.actions.requestInitialPokeData(this.activePage) 
   }
+
+  componentDidMount () {
+    this.props.actions.requestPokedexData()
+  }
+
   activePage = 1 // active page for pagination
 
-  handleSelect = (eventKey) => {
+  onPageSelect = (eventKey) => {
     this.setState({
       inputValue: ''
     })
@@ -29,7 +37,26 @@ class AppContainer extends Component {
       inputValue: e.target.value
     })
   }
-
+  onSearInputChange = (e) => {
+    this.setState({
+      searchInputValue: e.target.value
+    })
+  }
+  searchClick = () => {
+    this.props.actions.clearSearchList()
+    const searchedPokemon = this.props.appState.pokedexData[0].filter(pokemon => {
+      return pokemon.name.includes(this.state.searchInputValue)
+    })
+    const pokeId = `${searchedPokemon[0].resource_uri.split('/')[2]}/${searchedPokemon[0].resource_uri.split('/')[3]}`
+    this.props.actions.requestPokemon(pokeId)
+    this.setState({
+      isSearching: true
+    })
+  }
+  exitSearchClick = () => {
+    this.props.actions.clearSearchList()
+    this.setState({ isSearching: false })
+  }
   render () {
     const { appState } = this.props
     const filterByType = (pokemon) => {
@@ -44,7 +71,7 @@ class AppContainer extends Component {
       })
       return result
     }
-    const pokemons = appState.listOfPokemons.filter(pokemon => {
+    const pokemons = appState.initialListOfPokemons.filter(pokemon => {
       return (
         pokemon.name.includes(this.state.inputValue) 
         || 
@@ -53,59 +80,47 @@ class AppContainer extends Component {
     })
     return (
       <div>
-        {appState.requestsCount === 10 ? // if not all 10 requests loaded - show preloader
+        {appState.isIndividualRequestsSucceed ?
           <div className='app-container'>
-            <Navbar>
-              <FormGroup bsClass='search-container'>
-                <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
-              </FormGroup>
-            </Navbar>
-            <Table striped bordered condensed hover responsive>
-              <thead>
-                <tr>
-                  <th>Avatar</th>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Weight</th>
-                  <th>Height</th>
-                  <th>Speed</th>
-                  <th>Special-defense</th>
-                  <th>Special-attack</th>
-                  <th>Defense</th>
-                  <th>Attack</th>
-                  <th>HP</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pokemons.map((pokemon, index) => {
-                  return (
-                    <tr key={pokemon.id}>
-                      <td>
-                        <img src={pokemon.sprites.front_default} />
-                      </td>
-                      <td>{pokemon.name}</td>
-                      <td>{pokemon.types.map(type => {
-                        return (<p key={Math.random()}>{type.type.name}</p>)
-                      })}
-                      </td>
-                      <td>{pokemon.weight}</td>
-                      <td>{pokemon.height}</td>
-                      {pokemon.stats.map(stat => {
-                        return (
-                          <td key={Math.random()}>{stat.base_stat}</td>
-                        )
-                      })}
-                    </tr>
-                  )
-                })}
-                </tbody>
-            </Table>
-            <Pagination
-              bsSize="large"
-              items={3}
-              activePage={this.activePage}
-              onSelect={this.handleSelect}
-            />
+            {!this.state.isSearching ?
+            <div>
+              <Navbar>
+                <FormGroup bsClass='filter-container'>
+                  <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
+                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search' />
+                  <Button onClick={this.searchClick}>Search</Button>
+                </FormGroup>
+              </Navbar>
+              <PokemonTable
+                listOfPokemons={pokemons}
+                activePage={this.activePage}
+                onPageSelect={this.onPageSelect}
+              />
+            </div>
+            :
+            <div className='search-container'>
+              <Navbar>
+                <FormGroup bsClass='filter-container'>
+                  <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
+                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search' />
+                  <Button onClick={this.searchClick}>Search</Button>
+                  <Button onClick={this.exitSearchClick}>Exit search</Button>
+                </FormGroup>
+              </Navbar>
+              {
+                appState.listOfSearchedPokemons.length !== 0
+                ?
+                <PokemonTable
+                  listOfPokemons={appState.listOfSearchedPokemons}
+                  activePage={this.activePage}
+                  onPageSelect={this.onPageSelect}
+                  isSearching={this.state.isSearching}
+                />
+                :
+                <Preloader />
+              }
+            </div>
+            }
           </div>
           :
           <Preloader />

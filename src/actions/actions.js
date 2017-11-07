@@ -18,13 +18,14 @@ const flattenData = (data) => {
   return pokemon
 }
 
-export function requestPokeData (activePage) {
+async function fetchAsync (url) {
+  let response = await fetch(url, {cache: 'force-cache'})
+  let data = await response.json()
+  return data
+}
+
+export function requestInitialPokeData (activePage) {
   return async (dispatch) => {
-    async function fetchAsync (url) {
-      let response = await fetch(url, {cache: 'force-cache'})
-      let data = await response.json()
-      return data
-    }
     let reqestOffset;
     switch (activePage) {
       case 1:
@@ -43,21 +44,48 @@ export function requestPokeData (activePage) {
       // since pokeapi is almost always under heavy load im using only 30 pokemons in total for this app
       // only loading 10 at once
       .then(data => {
-        dispatch({ type: types.SEND_POKEAPI_REQUEST_SUCCSESS, payload: { pokemons: data } })
+        dispatch({ type: types.SEND_INITIAL_POKEAPI_REQUEST_SUCCSESS, payload: { pokemons: data } })
         let requestsCount = 0
         data.results.forEach(result => {
           fetchAsync(result.url)
             .then(pokeData => {
               requestsCount = requestsCount + 1 // requestCount here to help indicate amount of succsessful requests
-              dispatch({ type: types.REQUEST_POKEMON_DATA, payload: { pokeData, requestsCount } })
+              dispatch({ type: types.SEND_INITIAL_INDIVIDUAL_POKEMON_REQUEST_SUCCSESS, payload: { pokeData } })
+              if (requestsCount === 10) {
+                dispatch({ type: types.INDIVIDUAL_REQUESTS_FINISHED })
+              }
             })
             .catch(err => {
-              throw new Error(err);
+              dispatch({ type: types.SEND_INITIAL_INDIVIDUAL_POKEMON_REQUEST_FAIL })
             })
         })
       })
       .catch(reason => {
+        dispatch({ type: types.SEND_INITIAL_POKEAPI_REQUEST_FAIL })
+      })
+  }
+}
+
+export function requestPokedexData () {
+  return async (dispatch) => {
+    fetchAsync('https://pokeapi.co/api/v1/pokedex/')
+      .then(data => {
+        dispatch({ type: types.REQUEST_POKEDEX_DATA, payload: { pokedexData: data.objects[0].pokemon } })
+      })
+      .catch(reason => {
         throw new Error(reason.message);
+      })
+  }
+}
+
+export function requestPokemon (pokemonUrl) {
+  return async (dispatch) => {
+    fetchAsync(`https://pokeapi.co/api/v2/${pokemonUrl}`)
+      .then(data => {
+        dispatch({ type: types.SEND_INDIVIDUAL_POKEMON_REQUEST, payload: { pokemon: data } })
+      })
+      .catch(err => {
+        console.log('err: ', err)
       })
   }
 }
@@ -70,5 +98,10 @@ export const resetPokemonData = () => {
 export const resetRequestCount = () => {
   return {
     type: types.RESET_REQUEST_COUNT
+  }
+}
+export const clearSearchList = () => {
+  return {
+    type: types.CLEAR_SEARCH_LIST
   }
 }
