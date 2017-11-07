@@ -10,4 +10,4 @@ npm install
 npm start
 
 ```
-
+https://nekorsis.github.io/DecisionMapperTestTask/
