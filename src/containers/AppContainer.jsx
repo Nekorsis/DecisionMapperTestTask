@@ -87,7 +87,7 @@ class AppContainer extends Component {
               <Navbar>
                 <FormGroup bsClass='filter-container'>
                   <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
-                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search' />
+                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Filter' />
                   <Button onClick={this.searchClick}>Search</Button>
                 </FormGroup>
               </Navbar>
@@ -101,7 +101,7 @@ class AppContainer extends Component {
             <div className='search-container'>
               <Navbar>
                 <FormGroup bsClass='filter-container'>
-                  <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
+                  <FormControl onChange={this.onInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
                   <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search' />
                   <Button onClick={this.searchClick}>Search</Button>
                   <Button onClick={this.exitSearchClick}>Exit search</Button>
