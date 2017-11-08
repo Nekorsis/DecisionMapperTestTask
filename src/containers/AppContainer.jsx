@@ -87,7 +87,7 @@ class AppContainer extends Component {
               <Navbar>
                 <FormGroup bsClass='filter-container'>
                   <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
-                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Filter' />
+                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
                   <Button onClick={this.searchClick}>Search</Button>
                 </FormGroup>
               </Navbar>
