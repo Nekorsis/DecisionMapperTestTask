@@ -1,5 +1,5 @@
 import React, { PureComponent, Component } from 'react'
-import { Table, Pagination, Navbar, FormControl, FormGroup, Button } from 'react-bootstrap'
+import { Navbar, FormControl, FormGroup, Button } from 'react-bootstrap'
 import Preloader from './../components/preloader.jsx'
 import PokemonTable from './../components/pokemonTable.jsx'
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Pagination, Navbar, FormControl, FormGroup, Button } from 'react-bootstrap'
+import { Table, Pagination } from 'react-bootstrap'
 
 const PokemonTable = ({listOfPokemons, activePage, onPageSelect, isSearching}) => {
   return (

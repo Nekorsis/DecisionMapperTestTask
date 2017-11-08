@@ -37,7 +37,7 @@ const appReducer = (state = initialState, action) => {
     case types.INDIVIDUAL_REQUESTS_FINISHED:
       return {
         ...state,
-        isIndividualRequestsSucceed: true,
+        isIndividualRequestsSucceed: true
       }
     case types.SEND_INDIVIDUAL_POKEMON_REQUEST:
       return {
