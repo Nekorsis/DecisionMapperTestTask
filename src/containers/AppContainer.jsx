@@ -90,9 +90,9 @@ class AppContainer extends Component {
           <div className='app-container'>
             {!this.state.isSearching ?
             <div>
-              <Form inline>
+              <Form>
                 <FormGroup>
-                  <ControlLabel>Search in pokeapi</ControlLabel>
+                  <ControlLabel>{'Search in pokeapi '}</ControlLabel>
                   <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
                     <Button onClick={this.searchClick}>
                       {'Search'}
