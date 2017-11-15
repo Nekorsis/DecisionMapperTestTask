@@ -125,11 +125,6 @@ class AppContainer extends Component {
                     </Button>
                 </FormGroup>
               </Form>
-              <Navbar>
-                <FormGroup bsClass='filter-container'>
-                  <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
-                </FormGroup>
-              </Navbar>
               {
                 appState.listOfSearchedPokemons.length !== 0
                 ?
