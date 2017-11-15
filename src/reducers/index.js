@@ -7,7 +7,6 @@ const initialState = {
   isInitialRequestSucceed: false,
   isInitialRequestFailed: false,
   isIndividualRequestsSucceed: false,
-  isIndividualRequestsFailed: false,
   pokedexData: [],
   listOfSearchedPokemons: []
 }
@@ -38,6 +37,11 @@ const appReducer = (state = initialState, action) => {
       return {
         ...state,
         isIndividualRequestsSucceed: true
+      }
+    case types.INDIVIDUAL_REQUESTS_FAILED:
+      return {
+        ...state,
+        isIndividualRequestsSucceed: false
       }
     case types.SEND_INDIVIDUAL_POKEMON_REQUEST:
       return {

@@ -1,5 +1,5 @@
 import React, { PureComponent, Component } from 'react'
-import { Navbar, FormControl, FormGroup, Button } from 'react-bootstrap'
+import { Navbar, FormControl, FormGroup, Button, ControlLabel, Form } from 'react-bootstrap'
 import Preloader from './../components/preloader.jsx'
 import PokemonTable from './../components/pokemonTable.jsx'
 
@@ -28,8 +28,8 @@ class AppContainer extends Component {
     })
     this.activePage = eventKey
     this.props.actions.resetPokemonData() // empty redux data
-    this.props.actions.resetRequestCount() // reset requestCount to prevent bugs when swtiching pages
-    this.props.actions.requestPokeData(this.activePage) // request new data on page switch
+    this.props.actions.resetInitialRequestsStatus()
+    this.props.actions.requestInitialPokeData(this.activePage) // request new data on page switch
   }
   
   onInputChange = (e) => {
@@ -43,12 +43,20 @@ class AppContainer extends Component {
     })
   }
   searchClick = () => {
+    if (!this.state.searchInputValue) {
+      return
+    }
     this.props.actions.clearSearchList()
     const searchedPokemon = this.props.appState.pokedexData[0].filter(pokemon => {
+      if (pokemon.name.includes(this.state.searchInputValue)) {
+      }
       return pokemon.name.includes(this.state.searchInputValue)
     })
-    const pokeId = `${searchedPokemon[0].resource_uri.split('/')[2]}/${searchedPokemon[0].resource_uri.split('/')[3]}`
-    this.props.actions.requestPokemon(pokeId)
+
+    searchedPokemon.forEach(pokemon => {
+      const pokeId = `${pokemon.resource_uri.split('/')[2]}/${pokemon.resource_uri.split('/')[3]}`
+      this.props.actions.requestPokemon(pokeId)
+    })
     this.setState({
       isSearching: true
     })
@@ -63,11 +71,9 @@ class AppContainer extends Component {
       let result;
       pokemon.types.forEach(type => {
         if (type.type.name.includes(this.state.inputValue)) {
-            result = true;
-            return;
-          } else {
-            result = false;
-          }
+          result = true;
+          return
+        }
       })
       return result
     }
@@ -84,11 +90,19 @@ class AppContainer extends Component {
           <div className='app-container'>
             {!this.state.isSearching ?
             <div>
+              <Form inline>
+                <FormGroup>
+                  <ControlLabel>Search in pokeapi</ControlLabel>
+                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
+                    <Button onClick={this.searchClick}>
+                      {'Search'}
+                    </Button>
+                </FormGroup>
+              </Form>
               <Navbar>
                 <FormGroup bsClass='filter-container'>
+                  <ControlLabel>Filter result by type or name</ControlLabel>
                   <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
-                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
-                  <Button onClick={this.searchClick}>Search</Button>
                 </FormGroup>
               </Navbar>
               <PokemonTable
@@ -99,12 +113,21 @@ class AppContainer extends Component {
             </div>
             :
             <div className='search-container'>
+              <Form inline>
+                <FormGroup>
+                  <ControlLabel>Search in pokeapi</ControlLabel>
+                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
+                    <Button onClick={this.searchClick}>
+                      {'Search'}
+                    </Button>
+                    <Button onClick={this.exitSearchClick}>
+                      {'Exit search'}
+                    </Button>
+                </FormGroup>
+              </Form>
               <Navbar>
                 <FormGroup bsClass='filter-container'>
-                  <FormControl onChange={this.onInputChange} type='text' placeholder='Search pokemon by name in pokeapi database' />
-                  <FormControl onChange={this.onSearInputChange} type='text' placeholder='Search' />
-                  <Button onClick={this.searchClick}>Search</Button>
-                  <Button onClick={this.exitSearchClick}>Exit search</Button>
+                  <FormControl onChange={this.onInputChange} type='text' placeholder='Filter by name or pokemon type, for exmaply "bulbasaur" or "fire"' />
                 </FormGroup>
               </Navbar>
               {

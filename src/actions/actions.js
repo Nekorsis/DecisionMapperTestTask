@@ -26,21 +26,21 @@ async function fetchAsync (url) {
 
 export function requestInitialPokeData (activePage) {
   return async (dispatch) => {
-    let reqestOffset;
+    let reqestOffset
     switch (activePage) {
       case 1:
         reqestOffset = 0
         break
       case 2:
-        reqestOffset = 10
+        reqestOffset = 21
         break
       case 3:
-        reqestOffset = 20
+        reqestOffset = 42
         break
       default:
         break
     }
-    fetchAsync(`https://pokeapi.co/api/v2/pokemon/?limit=10${reqestOffset !== 0 ? '&offset=' + reqestOffset : ''}`)
+    fetchAsync(`https://pokeapi.co/api/v2/pokemon/?limit=21${reqestOffset !== 0 ? '&offset=' + reqestOffset : ''}`)
       // since pokeapi is almost always under heavy load im using only 30 pokemons in total for this app
       // only loading 10 at once
       .then(data => {
@@ -51,7 +51,7 @@ export function requestInitialPokeData (activePage) {
             .then(pokeData => {
               requestsCount = requestsCount + 1 // requestCount here to help indicate amount of succsessful requests
               dispatch({ type: types.SEND_INITIAL_INDIVIDUAL_POKEMON_REQUEST_SUCCSESS, payload: { pokeData } })
-              if (requestsCount === 10) {
+              if (requestsCount === 21) {
                 dispatch({ type: types.INDIVIDUAL_REQUESTS_FINISHED })
               }
             })
@@ -95,9 +95,10 @@ export const resetPokemonData = () => {
     type: types.RESET_POKEMON_DATA
   }
 }
-export const resetRequestCount = () => {
+
+export const resetInitialRequestsStatus = () => {
   return {
-    type: types.RESET_REQUEST_COUNT
+    type: types.INDIVIDUAL_REQUESTS_FAILED
   }
 }
 export const clearSearchList = () => {
